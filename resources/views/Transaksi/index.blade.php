@@ -149,7 +149,7 @@
                                 <div class="flex justify-center space-x-2">
                                     <a href="{{ route('transaksi.edit', $item->id) }}"
                                         class="text-yellow-600 hover:text-yellow-800 transition duration-150">
-                                        Edit
+                                        <i class="fa-regular fa-pen-to-square mr-2"></i>
                                     </a>
                                     <form action="{{ route('transaksi.destroy', $item->id) }}" method="POST"
                                         onsubmit="return confirm('Yakin ingin menghapus data ini?')" class="delete-form">
@@ -157,7 +157,7 @@
                                         @method('DELETE')
                                         <button type="submit"
                                             class="text-red-600 hover:text-red-800 transition duration-150">
-                                            Hapus
+                                            <i class="fa-regular fa-trash-can"></i>
                                         </button>
                                     </form>
                                 </div>

@@ -38,7 +38,7 @@
                                 <div class="flex space-x-2">
                                     <a href="{{ route('kategori.edit', $kategori->id) }}"
                                         class="text-yellow-600 hover:text-yellow-800 transition duration-150">
-                                        Edit
+                                        <i class="fa-regular fa-pen-to-square mr-2"></i>
                                     </a>
                                     <form action="{{ route('kategori.destroy', $kategori->id) }}" method="POST"
                                         onsubmit="return confirm('Apakah Anda yakin ingin menghapus kategori ini?')" class="delete-form">
@@ -46,7 +46,7 @@
                                         @method('DELETE')
                                         <button type="submit"
                                             class="text-red-600 hover:text-red-800 transition duration-150">
-                                            Hapus
+                                            <i class="fa-regular fa-trash-can"></i>
                                         </button>
                                     </form>
                                 </div>

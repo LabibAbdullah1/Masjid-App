@@ -175,7 +175,7 @@ class TransaksiController extends Controller
         $validatedData = $request->validate([
             'tanggal' => 'required|date',
             'kategori_id' => 'required|exists:kategori_keuangan,id',
-            'jenis' => 'required|in:Pemasukan,Pengeluaran',
+            'jenis' => 'required|in:pemasukan,pengeluaran',
             'jumlah' => 'required|numeric|min:0',
             'keterangan' => 'nullable|string|max:255',
         ]);
