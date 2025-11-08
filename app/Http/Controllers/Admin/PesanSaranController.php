@@ -21,14 +21,12 @@ class PesanSaranController extends Controller
         return view('admin.pesan.index', compact('pesanSaran'));
     }
 
-
      // Form balas pesan (admin).
     public function edit($id)
     {
         $pesan = PesanSaran::findOrFail($id);
         return view('admin.pesan.edit', compact('pesan'));
     }
-
 
      //Update balasan admin.
     public function update(Request $request, $id)
@@ -47,7 +45,6 @@ class PesanSaranController extends Controller
         return redirect()->route('admin.pesan.index')
             ->with('success', 'Balasan berhasil dikirim.');
     }
-
 
      // Hapus pesan (admin).
     public function destroy($id)

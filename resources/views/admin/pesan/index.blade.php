@@ -3,7 +3,7 @@
 @section('title', 'Pesan & Saran Masuk')
 
 @section('content')
-    <div class="max-w-5xl mx-auto mt-10 bg-white p-6 rounded-lg shadow" data-aos="fade-up">
+    <div class="max-w-full min-w-full mx-auto mt-10 bg-white p-6 rounded-lg shadow" data-aos="fade-up">
         <h2 class="text-3xl font-semibold text-gray-800 mb-4 text-center">Daftar Pesan & Saran</h2>
 
         <!-- Form Bulk Delete -->
@@ -22,16 +22,16 @@
                 <span class="text-gray-600 text-sm">Total Pesan: {{ $pesanSaran->total() }}</span>
             </div>
 
-            <table class="w-full border-collapse border border-gray-200">
+            <table class="w-full table-fixed border border-gray-200">
                 <thead>
                     <tr class="bg-gray-100 text-left">
-                        <th class="border px-1 py-2 text-center">
+                        <th class="border py-1 text-center">
                             <input type="checkbox" id="selectAll">
                         </th>
                         <th class="border px-3 py-2">Pengirim</th>
                         <th class="border px-3 py-2">Pesan</th>
                         <th class="border px-3 py-2">Balasan</th>
-                        <th class="border px-3 py-2">Aksi</th>
+                        <th class="border px-2 py-2">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,14 +57,14 @@
                             </td>
                             <td class="border px-3 py-2">
                                 <a href="{{ route('admin.pesan.edit', $pesan->id) }}"
-                                    class="text-blue-600 hover:underline">Balas</a>
+                                    class="text-blue-600 mr-2"><i class="fa-regular fa-pen-to-square"></i></a>
                                 <form action="{{ route('admin.pesan.destroy', $pesan->id) }}" method="POST"
                                     class="delete-form inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:underline"
                                         onclick="return confirm('Yakin hapus pesan ini?')">
-                                        Hapus
+                                        <i class="fa-regular fa-trash-can"></i>
                                     </button>
                                 </form>
                             </td>

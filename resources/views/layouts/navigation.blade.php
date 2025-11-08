@@ -1,25 +1,24 @@
 @php
     // Definisikan menu untuk Admin
     $adminMenuItems = [
-        ['name' => 'Home', 'route' => 'utama'],
-        ['name' => 'Dashboard', 'route' => 'dashboard'],
-        ['name' => 'Anggota', 'route' => 'admin.anggota.index'],
-        ['name' => 'Keuangan', 'route' => 'transaksi.index'],
-        ['name' => 'Kategori', 'route' => 'kategori.index'],
-        ['name' => 'Ceramah', 'route' => 'admin.jadwal-ceramah.index'],
-        ['name' => 'Quotes', 'route' => 'admin.quote.index'],
-        ['name' => 'Galeri', 'route' => 'admin.galeri.index'],
-        ['name' => 'Pesan', 'route' => 'admin.pesan.index'],
+        ['name' => 'Home', 'route' => 'utama', 'icon' => 'fa fa-home'],
+        ['name' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'fa fa-tachometer-alt'],
+        ['name' => 'Anggota', 'route' => 'admin.anggota.index', 'icon' => 'fa fa-users'],
+        ['name' => 'Keuangan', 'route' => 'transaksi.index', 'icon' => 'fa fa-wallet'],
+        ['name' => 'Kategori', 'route' => 'kategori.index', 'icon' => 'fa fa-list'],
+        ['name' => 'Ceramah', 'route' => 'admin.jadwal-ceramah.index', 'icon' => 'fa fa-microphone'],
+        ['name' => 'Quotes', 'route' => 'admin.quote.index', 'icon' => 'fa fa-quote-left'],
+        ['name' => 'Galeri', 'route' => 'admin.galeri.index', 'icon' => 'fa fa-image'],
+        ['name' => 'Pesan', 'route' => 'admin.pesan.index', 'icon' => 'fa fa-envelope'],
     ];
 
-    // Definisikan menu untuk Pengguna Umum
     $umumMenuItems = [
-        ['name' => 'Home', 'route' => 'utama'],
-        ['name' => 'Dashboard', 'route' => 'dashboard'],
-        ['name' => 'Keuangan', 'route' => 'umum.transaksi'],
-        ['name' => 'Galeri', 'route' => 'umum.galeri'],
-        ['name' => 'Ceramah', 'route' => 'umum.ceramah'],
-        ['name' => 'Kotak Pengaduan', 'route' => 'umum.pesan.create'],
+        ['name' => 'Home', 'route' => 'utama', 'icon' => 'fa fa-home'],
+        ['name' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'fa fa-tachometer-alt'],
+        ['name' => 'Keuangan', 'route' => 'umum.transaksi', 'icon' => 'fa fa-wallet'],
+        ['name' => 'Galeri', 'route' => 'umum.galeri', 'icon' => 'fa fa-image'],
+        ['name' => 'Ceramah', 'route' => 'umum.ceramah', 'icon' => 'fa fa-microphone'],
+        ['name' => 'Kotak Pengaduan', 'route' => 'umum.pesan.create', 'icon' => 'fa fa-comment-dots'],
     ];
 
     // Pilih menu sesuai role
@@ -41,6 +40,7 @@
             @foreach ($menuItems as $item)
                 <x-nav-link :href="route($item['route'])" :active="request()->routeIs($item['route'])"
                     class="block w-full text-white px-4 py-2 hover:bg-green-700 relative">
+                    <i class="{{ $item['icon'] }} mr-2"></i>
                     {{ __($item['name']) }}
 
                     {{-- Tambahin badge khusus menu Pesan --}}
@@ -56,24 +56,24 @@
 
 
         <!-- User Info -->
-            <div class="border-t border-green-700 p-4">
-                <div class="font-medium">{{ Auth::user()->name }}</div>
-                <div class="text-sm text-yellow-200">{{ Auth::user()->email }}</div>
+        <div class="border-t border-green-700 p-4">
+            <div class="font-medium">{{ Auth::user()->name }}</div>
+            <div class="text-sm text-yellow-200">{{ Auth::user()->email }}</div>
 
-                <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')" @click="open = false">
-                    {{ __('Kelola Profil') }}
+            <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')" @click="open = false">
+                <i class="fa-regular fa-user mr-2"></i>
+                {{ __('Kelola Profil') }}
+            </x-responsive-nav-link>
+
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <x-responsive-nav-link :href="route('logout')"
+                    onclick="event.preventDefault(); this.closest('form').submit(); open = false;">
+                    <i class="fa-solid fa-right-from-bracket mr-2"></i>
+                    Log Out
                 </x-responsive-nav-link>
-
-
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault(); this.closest('form').submit(); open = false;">
-                        Log Out
-                    </x-responsive-nav-link>
-                </form>
-            </div>
+            </form>
+        </div>
     </aside>
 
     <!-- Mobile Topbar -->
@@ -114,6 +114,7 @@
             <div class="flex-1 overflow-y-auto py-4 space-y-1">
                 @foreach ($menuItems as $item)
                     <x-responsive-nav-link :href="route($item['route'])" :active="request()->routeIs($item['route'])" @click="open = false">
+                        <i class="{{ $item['icon'] }} mr-2"></i>
                         {{ __($item['name']) }}
                     </x-responsive-nav-link>
                 @endforeach

@@ -9,9 +9,11 @@
     <title>{{ config('app.name', 'SIM Masjid') }}</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('/favicon1.svg') }}">
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <!-- AOS CSS -->
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-
 
     {{-- style and javascript --}}
     {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
@@ -69,74 +71,74 @@
     <!-- AOS JS -->
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
-        const loadingElement = document.getElementById('global-loading');
-        const loadingBar = document.getElementById('loading-bar');
-        const loadingText = document.getElementById('loading-text');
-        let progress = 0;
-        let interval = null;
+        // const loadingElement = document.getElementById('global-loading');
+        // const loadingBar = document.getElementById('loading-bar');
+        // const loadingText = document.getElementById('loading-text');
+        // let progress = 0;
+        // let interval = null;
 
-        // Tampilkan loading
-        function showLoading() {
-            if (!loadingElement) return;
+        // // Tampilkan loading
+        // function showLoading() {
+        //     if (!loadingElement) return;
 
-            loadingElement.classList.remove('hidden');
-            progress = 0;
-            loadingBar.style.width = '0%';
-            loadingText.textContent = 'Memuat halaman...';
+        //     loadingElement.classList.remove('hidden');
+        //     progress = 0;
+        //     loadingBar.style.width = '0%';
+        //     loadingText.textContent = 'Memuat halaman...';
 
-            // Simpan status loading ke localStorage
-            localStorage.setItem('isLoading', 'true');
+        //     // Simpan status loading ke localStorage
+        //     localStorage.setItem('isLoading', 'true');
 
-            // Jalankan animasi progress
-            interval = setInterval(() => {
-                if (progress < 95) {
-                    progress += 15;
-                    loadingBar.style.width = progress + '%';
-                }
-            }, 300);
-        }
+        //     // Jalankan animasi progress
+        //     interval = setInterval(() => {
+        //         if (progress < 95) {
+        //             progress += 15;
+        //             loadingBar.style.width = progress + '%';
+        //         }
+        //     }, 300);
+        // }
 
-        // Sembunyikan loading
-        function hideLoading() {
-            if (!loadingElement) return;
+        // // Sembunyikan loading
+        // function hideLoading() {
+        //     if (!loadingElement) return;
 
-            // Penuhkan bar, ganti teks
-            loadingBar.style.width = '100%';
-            loadingText.textContent = 'Selesai!';
+        //     // Penuhkan bar, ganti teks
+        //     loadingBar.style.width = '100%';
+        //     loadingText.textContent = 'Selesai!';
 
-            // Beri delay biar smooth
-            setTimeout(() => {
-                loadingElement.classList.add('hidden');
-                clearInterval(interval);
-                localStorage.removeItem('isLoading');
-            }, 400);
-        }
+        //     // Beri delay biar smooth
+        //     setTimeout(() => {
+        //         loadingElement.classList.add('hidden');
+        //         clearInterval(interval);
+        //         localStorage.removeItem('isLoading');
+        //     }, 400);
+        // }
 
-        // Pasang event ke semua form
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', () => {
-                    showLoading();
-                });
-            });
+        // // Pasang event ke semua form
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     document.querySelectorAll('form').forEach(form => {
+        //         form.addEventListener('submit', () => {
+        //             showLoading();
+        //         });
+        //     });
 
-            // Pasang event ke semua link (opsional)
-            document.querySelectorAll('a').forEach(link => {
-                const href = link.getAttribute('href');
-                if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
-                    link.addEventListener('click', () => {
-                        showLoading();
-                    });
-                }
-            });
-        });
+        //     // Pasang event ke semua link (opsional)
+        //     document.querySelectorAll('a').forEach(link => {
+        //         const href = link.getAttribute('href');
+        //         if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
+        //             link.addEventListener('click', () => {
+        //                 showLoading();
+        //             });
+        //         }
+        //     });
+        // });
 
-        // Saat halaman selesai dimuat → sembunyikan loading
-        window.addEventListener('load', () => {
-            if (localStorage.getItem('isLoading')) {
-                hideLoading();
-            }
-        });
+        // // Saat halaman selesai dimuat → sembunyikan loading
+        // window.addEventListener('load', () => {
+        //     if (localStorage.getItem('isLoading')) {
+        //         hideLoading();
+        //     }
+        // });
 
         // Untuk form delete
         document.addEventListener('DOMContentLoaded', function() {
