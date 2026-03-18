@@ -1,48 +1,44 @@
-{{-- resources/views/profile/edit.blade.php --}}
-@extends('layouts.guest')
+@extends('layouts.app')
 
-@section('header')
-    <div class="flex items-center justify-between">
-        <h2 class="font-bold text-2xl text-green-700 leading-tight">
-            🕌 {{ __('Profil Akun') }}
-        </h2>
-        <span class="text-sm text-gray-500 italic">Kelola informasi pribadi Anda</span>
-    </div>
-@endsection
+@section('header', 'System Identity')
 
 @section('content')
-    <div class="py-12 rounded-lg">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+    <div class="space-y-8" data-aos="fade-up">
+        {{-- Futuristic Header --}}
+        <div class="glass-card rounded-[2.5rem] p-8 futuristic-bg text-white relative overflow-hidden group">
+            <div class="absolute inset-0 bg-black/10"></div>
+            <div class="relative z-10 flex flex-col md:flex-row items-center gap-6">
+                <div class="p-5 bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa fa-user-gear text-4xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-black tracking-tighter">Profil Identitas Akun</h2>
+                    <p class="text-white/70 font-bold uppercase text-[10px] tracking-[0.4em] mt-1">Personal Data & Security Protocol</p>
+                </div>
+            </div>
+        </div>
 
+        <div class="space-y-12">
             <!-- Update Profile -->
-            <div class="p-6 bg-white/50 shadow-lg border-l-4 border-green-600 rounded-xl" data-aos="fade-up">
-                <h3 class="text-lg font-semibold text-green-700 mb-4">✏️ Perbarui Informasi Profil</h3>
-                <div class="max-w-xl">
+            <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5" data-aos="zoom-in">
+                <div class="p-10 lg:p-16">
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
 
             <!-- Update Password -->
-            <div class="p-6 bg-white/50 shadow-lg border-l-4 border-green-600 rounded-xl" data-aos="fade-up"
-                data-aos-delay="200">
-                <h3 class="text-lg font-semibold text-green-700 mb-4">🔒 Ganti Password</h3>
-                <div class="max-w-xl">
+            <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5" data-aos="zoom-in" data-aos-delay="100">
+                <div class="p-10 lg:p-16">
                     @include('profile.partials.update-password-form')
                 </div>
             </div>
 
             <!-- Delete Account -->
-            <div class="p-6 bg-white shadow-lg border-l-4 border-red-600 rounded-xl" data-aos="fade-up"
-                data-aos-delay="400">
-                <h3 class="text-lg font-semibold text-red-600 mb-4">⚠️ Hapus Akun</h3>
-                <p class="text-sm text-gray-600 mb-3">
-                    Menghapus akun akan menghilangkan semua data Anda secara permanen.
-                </p>
-                <div class="max-w-xl">
+            <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border border-red-500/10 group/delete" data-aos="zoom-in" data-aos-delay="200">
+                <div class="p-10 lg:p-16">
                     @include('profile.partials.delete-user-form')
                 </div>
             </div>
-
         </div>
     </div>
 @endsection

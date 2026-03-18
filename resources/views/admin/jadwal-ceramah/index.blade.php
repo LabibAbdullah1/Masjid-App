@@ -1,104 +1,103 @@
-{{-- resources/views/admin/jadwal-ceramah/index.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Jadwal Ceramah')
+@section('header', 'Jadwal Ceramah')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8" data-aos="fade-up">
-        <h1 class="text-3xl font-bold mb-6 text-center text-green-700">
-            📅 Jadwal Ceramah
-        </h1>
-
-        <!-- Tombol Tambah -->
-        <div class="flex justify-end mb-4">
-            <a href="{{ route('admin.jadwal-ceramah.create') }}"
-                class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">
-                + Tambah Jadwal
-            </a>
+    <div class="space-y-8" data-aos="fade-up">
+        {{-- Header & Action Bar --}}
+        <div class="glass-card rounded-[2.5rem] p-8 futuristic-bg text-white relative overflow-hidden group">
+            <div class="absolute inset-0 bg-black/10"></div>
+            <div class="relative z-10 flex flex-col md:flex-row items-center gap-6">
+                <div class="p-5 bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa fa-calendar-days text-4xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-black tracking-tighter">Protocol Dakwah Hub</h2>
+                    <p class="text-white/70 font-bold uppercase text-[10px] tracking-[0.4em] mt-1">Spiritual Event Synchronization</p>
+                </div>
+                <div class="md:ml-auto">
+                    <a href="{{ route('admin.jadwal-ceramah.create') }}" class="btn btn-white bg-white/20 hover:bg-white text-white hover:text-primary rounded-2xl border-none shadow-xl px-8 transition-all hover:scale-105">
+                        <i class="fa fa-plus-circle mr-2"></i> Tambah Jadwal
+                    </a>
+                </div>
+            </div>
         </div>
 
-        <!-- Tabel -->
-        <div class="bg-white shadow-lg rounded-lg overflow-x-auto max-w-full border-2 border-green-600" data-aos="fade-up"
-            data-aos-delay="200">
-            <table class="min-w-full leading-normal">
-                <thead class="bg-green-600 text-white">
-                    <tr>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            No
-                        </th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            Penceramah
-                        </th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            judul
-                        </th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            Tanggal
-                        </th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            Waktu
-                        </th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-center text-sm font-semibold uppercase tracking-wider">
-                            Aksi
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($jadwal as $item)
-                        <tr class="hover:bg-green-50 transition duration-150">
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                {{ $loop->iteration + ($jadwal->currentPage() - 1) * $jadwal->perPage() }}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                {{ $item->penceramah }}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                {{ $item->judul }}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                {{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('l, d M Y') }}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                {{ \Carbon\Carbon::parse($item->waktu)->format('H:i') }} WIB
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
-                                <div class="flex justify-center space-x-2">
-                                    <a href="{{ route('admin.jadwal-ceramah.edit', $item->id) }}"
-                                        class="text-yellow-600 hover:text-yellow-800 transition duration-150">
-                                        <i class="fa-regular fa-pen-to-square mr-2"></i>
-                                    </a>
-                                    <form action="{{ route('admin.jadwal-ceramah.destroy', $item->id) }}" method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')" class="delete-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="text-red-600 hover:text-red-800 transition duration-150">
-                                            <i class="fa-regular fa-trash-can"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
+        {{-- Table Display --}}
+        <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5" data-aos="fade-up">
+            <div class="overflow-x-auto">
+                <table class="table table-lg w-full">
+                    <thead>
+                        <tr class="bg-primary/5 text-primary/60 font-black uppercase text-[10px] tracking-[0.2em]">
+                            <th class="py-8 pl-10">Event Instance</th>
+                            <th>Resource (Penceramah)</th>
+                            <th>Core Theme</th>
+                            <th>Temporal Coordinate</th>
+                            <th class="text-center pr-10">Administrative Control</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="px-5 py-5 text-center text-gray-500">
-                                Belum ada jadwal ceramah.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody class="divide-y divide-base-200">
+                        @forelse($jadwal as $item)
+                            <tr class="hover:bg-primary/5 transition-all group">
+                                <td class="py-10 pl-10">
+                                    <div class="bg-base-200 text-base-content/40 w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs">
+                                        #{{ $loop->iteration + ($jadwal->currentPage() - 1) * $jadwal->perPage() }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="flex flex-col">
+                                        <span class="text-lg font-black tracking-tight group-hover:text-primary transition-colors">{{ $item->penceramah }}</span>
+                                        <span class="text-[9px] font-black uppercase opacity-40 tracking-[0.2em] mt-1 text-primary">Keynote Speaker</span>
+                                    </div>
+                                </td>
+                                <td class="font-bold opacity-70 italic max-w-xs truncate">
+                                    "{{ $item->judul }}"
+                                </td>
+                                <td>
+                                    <div class="flex flex-col gap-1">
+                                        <div class="badge badge-outline border-primary/20 font-black text-[10px] tracking-widest px-4 py-3">
+                                            {{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('l, d M Y') }}
+                                        </div>
+                                        <div class="flex items-center gap-2 text-xs font-bold opacity-40 ml-1">
+                                            <i class="fa fa-clock"></i>
+                                            {{ \Carbon\Carbon::parse($item->waktu)->format('H:i') }} WIB
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center pr-10">
+                                    <div class="flex justify-center gap-3">
+                                        <a href="{{ route('admin.jadwal-ceramah.edit', $item->id) }}"
+                                           class="btn btn-square btn-ghost text-warning hover:bg-warning/10 transition-colors">
+                                            <i class="fa-solid fa-pen-to-square text-lg"></i>
+                                        </a>
+                                        <form action="{{ route('admin.jadwal-ceramah.destroy', $item->id) }}" method="POST"
+                                            class="delete-form inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-square btn-ghost text-error hover:bg-error/10 transition-colors">
+                                                <i class="fa-solid fa-trash-can text-lg"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="py-32 text-center">
+                                    <div class="flex flex-col items-center gap-6 opacity-20">
+                                        <i class="fa fa-calendar-xmark text-9xl"></i>
+                                        <span class="text-2xl font-black uppercase tracking-[0.4em]">Zero Events Logged</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
-        <!-- Pagination -->
-        <div class="mt-6">
-            {{ $jadwal->links() }}
+            <div class="p-10 bg-base-200/20">
+                {{ $jadwal->links() }}
+            </div>
         </div>
     </div>
 @endsection

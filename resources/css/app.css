@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .glass-card {
+        @apply bg-opacity-80 backdrop-blur-xl border border-white/20 shadow-2xl ring-1 ring-white/10;
+    }
+    
+    .futuristic-bg {
+        background: linear-gradient(-45deg, #059669, #2563eb, #0d9488, #1d4ed8);
+        background-size: 400% 400%;
+        @apply animate-linear-flow;
+    }
+
+    /* Minimalist utilities for mobile */
+    .text-minimal {
+        @apply text-[10px] md:text-xs font-black uppercase tracking-[0.2em] opacity-60;
+    }
+
+    .container-minimal {
+        @apply p-4 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem];
+    }
+}
+
+/* Base contrast improvements */
+[data-theme='dark'] .glass-card {
+    @apply bg-slate-900/80 border-slate-700/50 ring-slate-800/50;
+}
+
+[data-theme='dark'] {
+    @apply text-slate-100;
+}
+
+.text-primary {
+    @apply font-black;
+}

@@ -1,104 +1,136 @@
 @extends('layouts.app')
 
-@section('title', 'Manajemen Anggota')
+@section('header', 'Manajemen Anggota')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8" data-aos="fade-up">
-        <h1 class="text-3xl font-bold mb-6 text-center text-green-700">
-            <i class="fas fa-users mr-2"></i> Manajemen Anggota
-        </h1>
-
-        <!-- Statistik Anggota -->
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
-            <div
-                class="bg-green-100 border-l-4 border-green-600 text-green-700 p-3 rounded-lg shadow-md w-full md:w-1/3 text-center">
-                <span class="text-lg font-semibold">Total Anggota :</span>
-                <span class="font-bold text-green-800" id="total-anggota">{{ $totalAnggota }}</span>
+    <div class="space-y-8" data-aos="fade-up">
+        {{-- Header & Stats Highlight --}}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {{-- Welcome Tile --}}
+            <div class="lg:col-span-2 glass-card rounded-[2.5rem] p-8 futuristic-bg text-white relative overflow-hidden group">
+                <div class="absolute inset-0 bg-black/10"></div>
+                <div class="relative z-10 flex flex-col md:flex-row items-center gap-6">
+                    <div class="p-5 bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 group-hover:scale-110 transition-transform duration-500">
+                        <i class="fa fa-users-gear text-4xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-black tracking-tighter">Database Jamaah</h2>
+                        <p class="text-white/70 font-bold uppercase text-[10px] tracking-[0.4em] mt-1">Personnel Management System</p>
+                    </div>
+                    <div class="md:ml-auto">
+                        <a href="{{ route('admin.anggota.create') }}" class="btn btn-white bg-white/20 hover:bg-white text-white hover:text-primary rounded-2xl border-none shadow-xl px-8 transition-all hover:scale-105">
+                            <i class="fa fa-plus-circle mr-2"></i> Tambah Anggota
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <!-- Form Pencarian -->
-            <div class="flex items-center gap-2 w-full md:w-1/3">
-                <input type="text" id="search" placeholder="Cari anggota berdasarkan nama..."
-                    class="w-full px-4 py-2 border border-green-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            {{-- Counter Tile --}}
+            <div class="glass-card rounded-[2.5rem] p-8 border border-primary/20 flex flex-col items-center justify-center text-center">
+                <span class="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-2">Authenticated Members</span>
+                <div class="text-5xl font-black text-primary flex items-baseline gap-2">
+                    <span id="total-anggota">{{ $totalAnggota }}</span>
+                    <span class="text-sm opacity-40">Jamaah</span>
+                </div>
+                <div class="mt-4 flex items-center gap-2 text-[10px] font-bold opacity-60">
+                    <i class="fa fa-circle-check text-success"></i>
+                    CLOUD SYNCHRONIZED
+                </div>
             </div>
         </div>
 
-        <!-- Tombol Tambah Anggota -->
-        <div class="flex justify-end mb-4">
-            <a href="{{ route('admin.anggota.create') }}"
-                class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">
-                + Tambah Anggota
-            </a>
+        {{-- Filter & Search Action Bar --}}
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="relative w-full md:w-1/2 group">
+                <div class="absolute left-6 top-1/2 -translate-y-1/2 text-primary opacity-40 group-focus-within:opacity-100 transition-opacity">
+                    <i class="fa fa-search text-xl"></i>
+                </div>
+                <input type="text" id="search" placeholder="Search by name, email, or digital signature..."
+                    class="input input-lg w-full pl-16 bg-base-100/50 backdrop-blur-sm border-base-200 focus:border-primary focus:outline-none rounded-2xl font-bold shadow-sm transition-all">
+            </div>
+            
+            <div class="flex gap-2 w-full md:w-auto">
+                <button class="btn btn-ghost rounded-2xl font-black px-6">
+                    <i class="fa fa-filter-list mr-2 opacity-40"></i> Filter
+                </button>
+                <button class="btn btn-outline rounded-2xl border-2 px-6">
+                    <i class="fa fa-download mr-2 opacity-40"></i> Export
+                </button>
+            </div>
         </div>
 
-        <!-- Tabel Anggota -->
-        <div class="bg-white shadow-lg rounded-lg overflow-x-auto max-w-full border-2 border-green-600" data-aos="fade-up"
-            data-aos-delay="200">
-            <table class="min-w-full leading-normal">
-                <thead class="bg-green-600 text-white">
-                    <tr>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            No</th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            Nama</th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            Email</th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-center text-sm font-semibold uppercase tracking-wider">
-                            Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="anggota-table">
-                    @forelse ($umums as $umum)
-                        <tr class="hover:bg-green-50 transition duration-150">
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                {{ $loop->iteration + ($umums->currentPage() - 1) * $umums->perPage() }}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                {{ $umum->name }}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                {{ $umum->email }}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
-                                <div class="flex justify-center space-x-2">
-                                    <a href="{{ route('admin.anggota.edit', $umum->id) }}"
-                                        class="text-yellow-600 hover:text-yellow-800 transition duration-150">
-                                        Edit
-                                    </a>
-                                    <form action="{{ route('admin.anggota.delete', $umum->id) }}" method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus anggota ini?')" class="delete-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="text-red-600 hover:text-red-800 transition duration-150">
-                                            Hapus
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
+        {{-- Table Display with Glassmorphism --}}
+        <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5" data-aos="fade-up">
+            <div class="overflow-x-auto">
+                <table class="table table-lg w-full">
+                    <thead>
+                        <tr class="bg-primary/5 text-primary/60 font-black uppercase text-[10px] tracking-[0.2em]">
+                            <th class="py-8 pl-10">Identifier</th>
+                            <th>Identity Detail</th>
+                            <th>Contact Endpoint</th>
+                            <th class="text-center pr-10">Administrative Control</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="px-5 py-5 text-center text-gray-500">
-                                Belum ada anggota yang terdaftar.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody id="anggota-table" class="divide-y divide-base-200">
+                        @forelse ($umums as $umum)
+                            <tr class="hover:bg-primary/5 transition-all group">
+                                <td class="py-10 pl-10">
+                                    <div class="flex items-center gap-4">
+                                        <div class="bg-base-200 text-base-content/40 w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs">
+                                            #{{ $loop->iteration + ($umums->currentPage() - 1) * $umums->perPage() }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="flex flex-col">
+                                        <span class="text-lg font-black tracking-tight group-hover:text-primary transition-colors">{{ $umum->name }}</span>
+                                        <span class="text-[9px] font-black uppercase opacity-40 tracking-[0.2em] mt-1">Verified Member</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="flex items-center gap-2 font-bold opacity-60">
+                                        <i class="fa fa-envelope-open text-xs text-primary/40"></i>
+                                        {{ $umum->email }}
+                                    </div>
+                                </td>
+                                <td class="text-center pr-10">
+                                    <div class="flex justify-center gap-3">
+                                        <a href="{{ route('admin.anggota.edit', $umum->id) }}"
+                                           class="btn btn-square btn-ghost text-warning hover:bg-warning/10 transition-colors">
+                                            <i class="fa-solid fa-pen-to-square text-lg"></i>
+                                        </a>
+                                        <form action="{{ route('admin.anggota.delete', $umum->id) }}" method="POST"
+                                            class="delete-form inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-square btn-ghost text-error hover:bg-error/10 transition-colors">
+                                                <i class="fa-solid fa-trash-can text-lg"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="py-32 text-center">
+                                    <div class="flex flex-col items-center gap-6 opacity-20">
+                                        <i class="fa fa-users-slash text-9xl"></i>
+                                        <span class="text-2xl font-black uppercase tracking-[0.4em]">Zero Assets Detected</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
-        <!-- Pagination -->
-        <div class="mt-6" id="pagination-links">
-            {{ $umums->links() }}
+            <div class="p-10 bg-base-200/20" id="pagination-links">
+                {{ $umums->links() }}
+            </div>
         </div>
     </div>
 
-    <!-- Live Search AJAX -->
+    {{-- Live Search AJAX Integration --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('search');
@@ -119,46 +151,55 @@
                         if (data.length > 0) {
                             data.forEach((item, index) => {
                                 anggotaTable.innerHTML += `
-                        <tr class="hover:bg-green-50 transition duration-150">
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                ${index + 1}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                ${item.name}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                ${item.email}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
-                                <div class="flex justify-center space-x-2">
-                                    <a href="/admin/anggota/${item.id}/edit"
-                                        class="text-yellow-600 hover:text-yellow-800 transition duration-150">
-                                        Edit
-                                    </a>
-                                    <form action="/admin/anggota/${item.id}" method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus anggota ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="text-red-600 hover:text-red-800 transition duration-150">
-                                            Hapus
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>`;
+                                    <tr class="hover:bg-primary/5 transition-all group border-b border-base-200">
+                                        <td class="py-10 pl-10">
+                                            <div class="flex items-center gap-4">
+                                                <div class="bg-base-200 text-base-content/40 w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs">
+                                                    #${index + 1}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="flex flex-col">
+                                                <span class="text-lg font-black tracking-tight group-hover:text-primary transition-colors">${item.name}</span>
+                                                <span class="text-[9px] font-black uppercase opacity-40 tracking-[0.2em] mt-1">Found Asset</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="flex items-center gap-2 font-bold opacity-60">
+                                                <i class="fa fa-envelope-open text-xs text-primary/40"></i>
+                                                ${item.email}
+                                            </div>
+                                        </td>
+                                        <td class="text-center pr-10">
+                                            <div class="flex justify-center gap-3">
+                                                <a href="/admin/anggota/${item.id}/edit" class="btn btn-square btn-ghost text-warning hover:bg-warning/10 transition-colors">
+                                                    <i class="fa-solid fa-pen-to-square text-lg"></i>
+                                                </a>
+                                                <form action="/admin/anggota/${item.id}" method="POST" class="delete-form inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-square btn-ghost text-error hover:bg-error/10 transition-colors">
+                                                        <i class="fa-solid fa-trash-can text-lg"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>`;
                             });
                         } else {
                             anggotaTable.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="px-5 py-5 text-center text-gray-500">
-                            Tidak ada anggota ditemukan.
-                        </td>
-                    </tr>
-                `;
+                                <tr>
+                                    <td colspan="4" class="py-32 text-center">
+                                        <div class="flex flex-col items-center gap-6 opacity-20">
+                                            <i class="fa fa-search-minus text-9xl"></i>
+                                            <span class="text-2xl font-black uppercase tracking-[0.4em]">No Match Found</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
                         }
 
-                        // Update jumlah total anggota sesuai hasil search
                         totalAnggota.textContent = data.length;
                     });
             });

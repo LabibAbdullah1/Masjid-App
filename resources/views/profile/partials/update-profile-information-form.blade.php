@@ -1,71 +1,89 @@
-<section class="bg-white shadow-lg rounded-xl p-6 border-l-4 border-green-600">
-    <header class="mb-4">
-        <h2 class="text-xl font-bold text-green-700 flex items-center gap-2">
-            🕌 {{ __('Informasi Profil') }}
-        </h2>
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('Perbarui informasi akun dan alamat email Anda.') }}
-        </p>
+<section class="space-y-12">
+    <header class="flex items-center gap-6 p-8 bg-primary/5 rounded-[2rem] border border-primary/10 mb-10">
+        <div class="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/20">
+            <i class="fa fa-id-card text-2xl"></i>
+        </div>
+        <div>
+            <h2 class="text-2xl font-black tracking-tight text-white mb-1">
+                {{ __('Informasi Identitas') }}
+            </h2>
+            <p class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">
+                {{ __('Update your profile identifiers and contact link.') }}
+            </p>
+        </div>
     </header>
 
-    {{-- Form Kirim Verifikasi --}}
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf
     </form>
 
-    {{-- Form Update Profil --}}
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="space-y-10">
         @csrf
         @method('patch')
 
-        <!-- Nama -->
-        <div>
-            <x-input-label for="name" :value="__('Nama Lengkap')" class="text-green-700 font-semibold" />
-            <x-text-input id="name" name="name" type="text"
-                class="mt-1 block w-full rounded-lg border-green-300 focus:border-green-500 focus:ring-green-500"
-                :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2 text-red-600" :messages="$errors->get('name')" />
-        </div>
-
-        <!-- Email -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" class="text-green-700 font-semibold" />
-            <x-text-input id="email" name="email" type="email"
-                class="mt-1 block w-full rounded-lg border-green-300 focus:border-green-500 focus:ring-green-500"
-                :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2 text-red-600" :messages="$errors->get('email')" />
-
-            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$user->hasVerifiedEmail())
-                <div class="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p class="text-sm text-yellow-700">
-                        📩 {{ __('Email Anda belum diverifikasi.') }}
-
-                        <button form="send-verification"
-                            class="ml-1 underline text-sm font-medium text-green-700 hover:text-green-900">
-                            {{ __('Kirim ulang email verifikasi.') }}
-                        </button>
-                    </p>
-
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600">
-                            ✅ {{ __('Link verifikasi baru telah dikirim ke email Anda.') }}
-                        </p>
-                    @endif
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <!-- Nama -->
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-black uppercase text-[10px] tracking-widest opacity-40">Profile Alias / Name</span>
+                </label>
+                <div class="relative group">
+                    <div class="absolute left-6 top-1/2 -translate-y-1/2 text-primary opacity-20 group-focus-within:opacity-100 transition-opacity">
+                        <i class="fa fa-user-tag text-lg"></i>
+                    </div>
+                    <input type="text" name="name" value="{{ old('name', $user->name) }}" 
+                           class="input input-lg w-full pl-16 bg-base-300/30 border-base-300 focus:border-primary focus:outline-none transition-all font-black text-lg rounded-2xl" 
+                           required autofocus autocomplete="name" />
                 </div>
-            @endif
+                @error('name') <span class="text-error text-[10px] font-black uppercase mt-2 ml-2 tracking-widest">{{ $message }}</span> @enderror
+            </div>
+
+            <!-- Email -->
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-black uppercase text-[10px] tracking-widest opacity-40">Communication Node (Email)</span>
+                </label>
+                <div class="relative group">
+                    <div class="absolute left-6 top-1/2 -translate-y-1/2 text-primary opacity-20 group-focus-within:opacity-100 transition-opacity">
+                        <i class="fa fa-envelope text-lg"></i>
+                    </div>
+                    <input type="email" name="email" value="{{ old('email', $user->email) }}" 
+                           class="input input-lg w-full pl-16 bg-base-300/30 border-base-300 focus:border-primary focus:outline-none transition-all font-black text-lg rounded-2xl" 
+                           required autocomplete="username" />
+                </div>
+                @error('email') <span class="text-error text-[10px] font-black uppercase mt-2 ml-2 tracking-widest">{{ $message }}</span> @enderror
+
+                @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$user->hasVerifiedEmail())
+                    <div class="mt-6 p-6 glass-card border-warning/20 bg-warning/5 rounded-2xl">
+                        <p class="text-xs font-bold text-warning flex items-center gap-3">
+                            <i class="fa fa-triangle-exclamation text-lg"></i>
+                            {{ __('Verification protocol required.') }}
+                        </p>
+                        <button form="send-verification" class="mt-4 btn btn-xs btn-warning btn-outline rounded-lg font-black tracking-widest uppercase">
+                            {{ __('Re-trigger Verification') }}
+                        </button>
+
+                        @if (session('status') === 'verification-link-sent')
+                            <p class="mt-3 text-[9px] font-black uppercase tracking-widest text-success animate-pulse">
+                                {{ __('New link dispatched to transmission node.') }}
+                            </p>
+                        @endif
+                    </div>
+                @endif
+            </div>
         </div>
 
-        <!-- Tombol Simpan -->
-        <div class="flex items-center gap-4">
-            <x-primary-button class="bg-green-600 hover:bg-green-700 focus:ring-green-500">
-                💾 {{ __('Simpan Perubahan') }}
-            </x-primary-button>
+        <div class="flex items-center gap-6 pt-6 border-t border-white/5">
+            <button type="submit" class="btn btn-primary btn-lg rounded-2xl font-black px-12 futuristic-bg border-none text-white hover:scale-105 transition-all">
+                Update Identity
+            </button>
 
             @if (session('status') === 'profile-updated')
-                <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-green-600 font-medium">
-                    ✅ {{ __('Tersimpan.') }}
-                </p>
+                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
+                     class="flex items-center gap-2 text-success font-black uppercase text-[10px] tracking-widest">
+                    <i class="fa fa-check-double scale-125"></i>
+                    {{ __('Node Updated Successfully') }}
+                </div>
             @endif
         </div>
     </form>

@@ -1,86 +1,130 @@
 @extends('layouts.app')
 
-@section('title', 'Pesan & Saran Masuk')
+@section('header', 'Communication Hub')
 
 @section('content')
-    <div class="max-w-full min-w-full mx-auto mt-10 bg-white p-6 rounded-lg shadow" data-aos="fade-up">
-        <h2 class="text-3xl font-semibold text-gray-800 mb-4 text-center">Daftar Pesan & Saran</h2>
+    <div class="space-y-8" data-aos="fade-up">
+        {{-- Header & Total Stats --}}
+        <div class="glass-card rounded-[2.5rem] p-8 futuristic-bg text-white relative overflow-hidden group">
+            <div class="absolute inset-0 bg-black/10"></div>
+            <div class="relative z-10 flex flex-col md:flex-row items-center gap-6">
+                <div class="p-5 bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa fa-envelope-open-text text-4xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-black tracking-tighter">Pusat Pesan & Saran</h2>
+                    <p class="text-white/70 font-bold uppercase text-[10px] tracking-[0.4em] mt-1">Inbound Data Transmission Protocol</p>
+                </div>
+                <div class="md:ml-auto flex items-center gap-6">
+                    <div class="text-right">
+                        <span class="block text-[10px] font-black uppercase tracking-widest text-white/40">Total Packets</span>
+                        <span class="text-3xl font-black tracking-tighter">{{ $pesanSaran->total() }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Form Bulk Delete -->
+        {{-- Main Inbox Table --}}
         <form id="bulkDeleteForm" action="{{ route('admin.pesan.bulkDelete') }}" method="POST">
             @csrf
             @method('DELETE')
 
-            <div class="mb-4 flex justify-between items-center">
-                <div>
+            <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5" x-data="{ selectedCount: 0 }">
+                {{-- Bulk Action Bar --}}
+                <div class="p-6 bg-primary/5 flex items-center justify-between border-b border-white/5">
+                    <div class="flex items-center gap-4">
+                        <input type="checkbox" id="selectAll" class="checkbox checkbox-primary checkbox-sm rounded-lg border-2" @change="selectedCount = $el.checked ? {{ count($pesanSaran) }} : 0">
+                        <span class="text-[10px] font-black uppercase tracking-widest opacity-40">Batch Operations</span>
+                    </div>
                     <button type="submit" id="deleteSelectedBtn"
-                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded hidden"
-                        onclick="return confirm('Yakin ingin menghapus pesan terpilih?')">
-                        Hapus Terpilih
+                            class="btn btn-error btn-sm rounded-xl font-black text-[10px] tracking-widest uppercase hidden group"
+                            onclick="return confirm('Wipe selected transmissions from memory?')">
+                        <i class="fa fa-trash-can mr-2 group-hover:animate-bounce"></i> Purge Selected
                     </button>
                 </div>
-                <span class="text-gray-600 text-sm">Total Pesan: {{ $pesanSaran->total() }}</span>
+
+                <div class="overflow-x-auto">
+                    <table class="table table-lg w-full">
+                        <thead>
+                            <tr class="text-primary/60 font-black uppercase text-[10px] tracking-[0.2em] border-b border-white/5">
+                                <th class="w-16"></th>
+                                <th class="py-6 pl-10">Subject Source</th>
+                                <th>Transmission Payload</th>
+                                <th>Response Status</th>
+                                <th class="text-center pr-10">Control</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-base-200">
+                            @forelse ($pesanSaran as $pesan)
+                                <tr class="hover:bg-primary/5 transition-all group">
+                                    <td class="text-center">
+                                        <input type="checkbox" name="ids[]" value="{{ $pesan->id }}" class="selectItem checkbox checkbox-primary checkbox-sm rounded-lg border-2">
+                                    </td>
+                                    <td class="py-8 pl-10">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-black text-primary border border-primary/20">
+                                                {{ substr($pesan->user->name, 0, 1) }}
+                                            </div>
+                                            <div>
+                                                <div class="font-black tracking-tight text-lg">{{ $pesan->user->name }}</div>
+                                                <div class="text-[9px] font-black uppercase tracking-widest opacity-30">User Node ID: #{{ $pesan->user->id }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="max-w-xs">
+                                        <p class="text-sm font-medium opacity-70 line-clamp-2 italic">
+                                            "{{ $pesan->pesan }}"
+                                        </p>
+                                    </td>
+                                    <td>
+                                        @if ($pesan->feedback)
+                                            <div class="flex flex-col gap-1">
+                                                <span class="badge badge-success badge-outline font-black text-[9px] tracking-widest px-3 py-2 uppercase">Protocol Responded</span>
+                                                <span class="text-[9px] font-black uppercase opacity-30 ml-1">
+                                                    {{ $pesan->dibalas_pada->format('d.m.Y // H:i') }}
+                                                </span>
+                                            </div>
+                                        @else
+                                            <span class="badge badge-error badge-outline font-black text-[9px] tracking-widest px-3 py-2 uppercase animate-pulse">Awaiting Input</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center pr-10">
+                                        <div class="flex justify-center gap-2">
+                                            <a href="{{ route('admin.pesan.edit', $pesan->id) }}"
+                                               class="btn btn-square btn-ghost text-primary hover:bg-primary/10">
+                                                <i class="fa-solid fa-reply-all text-lg"></i>
+                                            </a>
+                                            <form action="{{ route('admin.pesan.destroy', $pesan->id) }}" method="POST"
+                                                  class="delete-form inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-square btn-ghost text-error hover:bg-error/10"
+                                                        onclick="return confirm('Erase transmission record?')">
+                                                    <i class="fa-solid fa-trash-can text-lg"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="py-32 text-center opacity-20">
+                                        <div class="flex flex-col items-center gap-6">
+                                            <i class="fa fa-shuttle-space text-9xl"></i>
+                                            <span class="text-2xl font-black uppercase tracking-[0.4em]">Zero Inbound Signals</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="p-10 bg-base-200/20">
+                    {{ $pesanSaran->links() }}
+                </div>
             </div>
-
-            <table class="w-full table-fixed border border-gray-200">
-                <thead>
-                    <tr class="bg-gray-100 text-left">
-                        <th class="border py-1 text-center">
-                            <input type="checkbox" id="selectAll">
-                        </th>
-                        <th class="border px-3 py-2">Pengirim</th>
-                        <th class="border px-3 py-2">Pesan</th>
-                        <th class="border px-3 py-2">Balasan</th>
-                        <th class="border px-2 py-2">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($pesanSaran as $pesan)
-                        <tr>
-                            <td class="border px-1 py-2 text-center">
-                                <input type="checkbox" name="ids[]" value="{{ $pesan->id }}" class="selectItem">
-                            </td>
-                            <td class="border px-3 py-2">{{ $pesan->user->name }}</td>
-                            <td class="border px-3 py-2 break-words max-h-64 overflow-y-auto first-letter:uppercase">
-                                {{ $pesan->pesan }}
-                            </td>
-                            <td class="border px-3 py-2 break-words max-h-64 overflow-y-auto first-letter:uppercase">
-                                @if ($pesan->feedback)
-                                    <span class="text-green-600">{{ $pesan->feedback }}</span>
-                                    <br>
-                                    <small class="text-gray-500">Dibalas pada:
-                                        {{ $pesan->dibalas_pada->format('d M Y H:i') }}
-                                    </small>
-                                @else
-                                    <span class="text-red-500">Belum dibalas</span>
-                                @endif
-                            </td>
-                            <td class="border px-3 py-2">
-                                <a href="{{ route('admin.pesan.edit', $pesan->id) }}"
-                                    class="text-blue-600 mr-2"><i class="fa-regular fa-pen-to-square"></i></a>
-                                <form action="{{ route('admin.pesan.destroy', $pesan->id) }}" method="POST"
-                                    class="delete-form inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:underline"
-                                        onclick="return confirm('Yakin hapus pesan ini?')">
-                                        <i class="fa-regular fa-trash-can"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center py-4">Belum ada pesan.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
         </form>
-
-        <div class="mt-4">
-            {{ $pesanSaran->links() }}
-        </div>
     </div>
 
     <script>

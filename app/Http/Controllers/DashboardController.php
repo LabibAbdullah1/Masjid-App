@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Transaksi;
 
 class DashboardController extends Controller
 {
@@ -11,9 +12,11 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        if($user->role === 'admin'){
-            return view('dashboard');
-        }
-            return view('dashboard');
+        // Calculate standard financial metrics for the mosque
+        $totalPemasukan = Transaksi::where('jenis', 'pemasukan')->sum('jumlah');
+        $totalPengeluaran = Transaksi::where('jenis', 'pengeluaran')->sum('jumlah');
+        $saldo = $totalPemasukan - $totalPengeluaran;
+
+        return view('dashboard', compact('totalPemasukan', 'totalPengeluaran', 'saldo'));
     }
 }

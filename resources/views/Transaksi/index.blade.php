@@ -1,184 +1,161 @@
-{{-- resources/views/transaksi/index.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8" data-aos="fade-up">
-        {{-- Header --}}
-        <h1 class="text-3xl font-bold mb-2 text-center text-green-700">
-            <i class="fas fa-money-bill-wave mr-2"></i> Kelola Transaksi
-        </h1>
-        <p class="text-gray-600 font-semibold text-center mb-6">
-            Pilih kategori di bawah untuk menampilkan data sesuai kebutuhan
-        </p>
-
-        <div class="flex justify-end mb-4 space-x-3">
-            {{-- Tombol Cetak PDF --}}
-            @if (!empty($kategoriId))
-                <form action="{{ route('transaksi.cetak') }}" method="GET" target="_blank">
-                    <input type="hidden" name="bulan" value="{{ request('bulan') ?? date('m') }}">
-                    <input type="hidden" name="tahun" value="{{ request('tahun') ?? date('Y') }}">
-                    <input type="hidden" name="kategori_id" value="{{ $kategoriId }}">
-                    <button type="submit"
-                        class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">
-                        Cetak PDF
-                    </button>
-                </form>
-            @endif
-
-            {{-- Tombol Tambah Transaksi --}}
-            <a href="{{ route('transaksi.create') }}"
-                class="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300">
-                + Tambah Transaksi
-            </a>
+    <div class="space-y-6" data-aos="fade-up">
+        {{-- Page Title & Header Actions --}}
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-black text-base-content flex items-center gap-3">
+                    <i class="fa fa-wallet text-primary"></i>
+                    Manajemen Keuangan
+                </h1>
+                <p class="text-sm opacity-60 font-bold uppercase tracking-widest mt-1">Laporan Arus Kas Masjid</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                @if (!empty($kategoriId))
+                    <form action="{{ route('transaksi.cetak') }}" method="GET" target="_blank">
+                        <input type="hidden" name="bulan" value="{{ request('bulan') ?? date('m') }}">
+                        <input type="hidden" name="tahun" value="{{ request('tahun') ?? date('Y') }}">
+                        <input type="hidden" name="kategori_id" value="{{ $kategoriId }}">
+                        <button type="submit" class="btn btn-outline btn-warning gap-2">
+                            <i class="fa fa-file-pdf"></i>
+                            Cetak Laporan
+                        </button>
+                    </form>
+                @endif
+                
+                <a href="{{ route('transaksi.create') }}" class="btn btn-primary gap-2 shadow-lg shadow-primary/20">
+                    <i class="fa fa-plus"></i>
+                    Tambah Transaksi
+                </a>
+            </div>
         </div>
 
-        {{-- Navigasi Kategori --}}
-        <nav class="bg-green-600 text-white rounded-t-lg p-4 shadow-lg mb-0" data-aos="fade-up" data-aos-delay="200">
-            <ul class="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center justify-center">
+        {{-- Kategori Tabs --}}
+        <div class="bg-base-100 p-2 rounded-xl shadow-sm border border-base-200 overflow-x-auto">
+            <div class="tabs tabs-boxed bg-transparent gap-1">
                 @foreach ($kategoriList as $kategori)
                     @php
                         $currentKategoriId = request()->input('kategori_id');
                         $isActive = $currentKategoriId == $kategori->id;
-                        $activeClass = $isActive
-                            ? 'bg-yellow-500 text-white'
-                            : 'text-white hover:text-yellow-300 hover:bg-green-700';
                     @endphp
-                    <li>
-                        <a href="{{ route('transaksi.index', ['kategori_id' => $kategori->id]) }}"
-                            class="block px-4 py-2 text-md font-semibold transition duration-300 ease-in-out rounded-lg {{ $activeClass }}">
-                            {{ $kategori->nama_kategori }}
-                        </a>
-                    </li>
+                    <a href="{{ route('transaksi.index', ['kategori_id' => $kategori->id]) }}" 
+                       class="tab tab-lg px-6 font-bold transition-all {{ $isActive ? 'tab-active !bg-primary !text-primary-content' : 'hover:bg-base-200' }}">
+                        {{ $kategori->nama_kategori }}
+                    </a>
                 @endforeach
-            </ul>
-        </nav>
+            </div>
+        </div>
 
-        {{-- Ringkasan Keuangan --}}
-        <div class="bg-white shadow-md p-4 rounded-b-lg mb-6 border-2 border-green-600" data-aos="fade-up"
-            data-aos-delay="200">
-            <h2 class="text-lg font-semibold mb-3">
-                Ringkasan Keuangan: {{ $kategoriAktif->nama_kategori ?? 'Keseluruhan' }}
-            </h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Total Pemasukan -->
-                <div x-data="counter({{ $totalPemasukan }})" x-init="start()" class="p-3 bg-green-100 rounded">
-                    <span class="block text-sm text-green-700">Total Pemasukan</span>
-                    <span class="text-xl font-bold text-green-800">
-                        Rp <span x-text="displayCount()"></span>
-                    </span>
+        {{-- Stats Summary --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="stats shadow bg-base-100 border border-base-200">
+                <div class="stat">
+                    <div class="stat-title text-success font-bold uppercase text-xs opacity-60">Pemasukan</div>
+                    <div class="stat-value text-success">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</div>
+                    <div class="stat-desc font-medium">Berdasarkan filter aktif</div>
                 </div>
-
-                <!-- Total Pengeluaran -->
-                <div x-data="counter({{ $totalPengeluaran }})" x-init="start()" class="p-3 bg-red-100 rounded">
-                    <span class="block text-sm text-red-700">Total Pengeluaran</span>
-                    <span class="text-xl font-bold text-red-800">
-                        Rp <span x-text="displayCount()"></span>
-                    </span>
+            </div>
+            
+            <div class="stats shadow bg-base-100 border border-base-200">
+                <div class="stat">
+                    <div class="stat-title text-error font-bold uppercase text-xs opacity-60">Pengeluaran</div>
+                    <div class="stat-value text-error">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</div>
+                    <div class="stat-desc font-medium">Berdasarkan filter aktif</div>
                 </div>
+            </div>
 
-                <!-- Saldo -->
-                <div x-data="counter({{ $saldo }})" x-init="start()" class="p-3 bg-blue-100 rounded">
-                    <span class="block text-sm text-blue-700">Saldo</span>
-                    <span class="text-xl font-bold text-blue-800">
-                        Rp <span x-text="displayCount()"></span>
-                    </span>
+            <div class="stats shadow bg-primary text-primary-content border border-primary/20">
+                <div class="stat">
+                    <div class="stat-title text-primary-content font-bold uppercase text-xs opacity-70">Saldo Akhir</div>
+                    <div class="stat-value font-black">Rp {{ number_format($saldo, 0, ',', '.') }}</div>
+                    <div class="stat-desc text-primary-content opacity-70 font-medium">Kategori: {{ $kategoriAktif->nama_kategori ?? 'Semua' }}</div>
                 </div>
             </div>
         </div>
 
-        {{-- Tabel Transaksi --}}
-        <div class="max-w-full bg-white shadow-lg rounded-lg overflow-x-auto border-2 border-green-600" data-aos="fade-up"
-            data-aos-delay="400">
-            <table class="min-w-full leading-normal">
-                <thead class="bg-green-600 text-white">
-                    <tr>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            No
-                        </th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            Tanggal
-                        </th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            Jenis
-                        </th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            Jumlah
-                        </th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            Keterangan
-                        </th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-left text-sm font-semibold uppercase tracking-wider">
-                            Kategori
-                        </th>
-                        <th
-                            class="px-5 py-3 border-b-2 border-gray-200 text-center text-sm font-semibold uppercase tracking-wider">
-                            Aksi
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($transaksis as $item)
-                        <tr class="hover:bg-green-50 transition duration-150">
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                {{ $loop->iteration + ($transaksis->currentPage() - 1) * $transaksis->perPage() }}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                {{ $item->created_at->format('d-m-Y') }}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm capitalize">
-                                {{ $item->jenis }}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                Rp {{ number_format($item->jumlah, 0, ',', '.') }}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm first-letter:uppercase">
-                                {{ $item->keterangan }}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                {{-- Tampilkan nama kategori --}}
-                                {{ $item->kategori ? $item->kategori->nama_kategori : '-' }}
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
-                                <div class="flex justify-center space-x-2">
-                                    <a href="{{ route('transaksi.edit', $item->id) }}"
-                                        class="text-yellow-600 hover:text-yellow-800 transition duration-150">
-                                        <i class="fa-regular fa-pen-to-square mr-2"></i>
-                                    </a>
-                                    <form action="{{ route('transaksi.destroy', $item->id) }}" method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus data ini?')" class="delete-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="text-red-600 hover:text-red-800 transition duration-150">
-                                            <i class="fa-regular fa-trash-can"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="px-5 py-5 text-center text-gray-500">
-                                Tidak ada data
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-
-            </table>
-        </div>
-
-
-        {{-- Pagination --}}
-        <div class="mt-6">
-            {{ $transaksis->withQueryString()->links() }}
+        {{-- Table Container --}}
+        <div class="card bg-base-100 shadow-sm border border-base-200">
+            <div class="card-body p-0">
+                <div class="overflow-x-auto">
+                    <table class="table table-lg w-full">
+                        <thead class="bg-base-200/50">
+                            <tr>
+                                <th class="w-16">No</th>
+                                <th>Informasi Transaksi</th>
+                                <th>Kategori</th>
+                                <th class="text-right">Jumlah</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($transaksis as $item)
+                                <tr class="hover:bg-base-200/30 transition-colors">
+                                    <td class="font-bold opacity-40">
+                                        {{ $loop->iteration + ($transaksis->currentPage() - 1) * $transaksis->perPage() }}
+                                    </td>
+                                    <td>
+                                        <div class="flex flex-col">
+                                            <span class="font-black text-lg">{{ $item->keterangan }}</span>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <span class="badge badge-ghost badge-sm font-bold">{{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}</span>
+                                                @if(strtolower($item->jenis) == 'pemasukan')
+                                                    <span class="badge badge-success badge-sm text-white font-bold gap-1">
+                                                        <i class="fa fa-arrow-down scale-75"></i> Masuk
+                                                    </span>
+                                                @else
+                                                    <span class="badge badge-error badge-sm text-white font-bold gap-1">
+                                                        <i class="fa fa-arrow-up scale-75"></i> Keluar
+                                                    </span>
+                                                @endif
+                                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="badge badge-outline font-bold opacity-70">{{ $item->kategori->nama_kategori }}</div>
+                                    </td>
+                                    <td class="text-right font-black">
+                                        <span class="{{ strtolower($item->jenis) == 'pemasukan' ? 'text-success' : 'text-error' }}">
+                                            {{ strtolower($item->jenis) == 'pemasukan' ? '+' : '-' }}
+                                            Rp {{ number_format($item->jumlah, 0, ',', '.') }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="flex justify-center gap-2">
+                                            <a href="{{ route('transaksi.edit', $item->id) }}" class="btn btn-square btn-ghost btn-sm text-info">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <form action="{{ route('transaksi.destroy', $item->id) }}" method="POST" class="delete-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-square btn-ghost btn-sm text-error" onclick="return confirm('Hapus transaksi ini?')">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="py-20 text-center opacity-30">
+                                        <div class="flex flex-col items-center gap-4">
+                                            <i class="fa fa-folder-open text-6xl"></i>
+                                            <span class="font-black uppercase tracking-widest">Tidak ada data transaksi</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            {{-- Pagination --}}
+            @if($transaksis->hasPages())
+                <div class="card-footer p-6 border-t border-base-200">
+                    {{ $transaksis->withQueryString()->links() }}
+                </div>
+            @endif
         </div>
     </div>
 @endsection

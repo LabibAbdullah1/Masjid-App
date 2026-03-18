@@ -1,5 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth transition-all duration-500" x-data="{ 
+    theme: localStorage.getItem('theme') || 'light',
+    toggleTheme() {
+        this.theme = this.theme === 'light' ? 'dark' : 'light';
+        localStorage.setItem('theme', this.theme);
+    }
+}" :data-theme="theme">
 
 <head>
     <meta charset="utf-8">
@@ -15,133 +21,111 @@
     <!-- AOS CSS -->
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
-    {{-- style and javascript --}}
-    {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
-
-    <script src="https://unpkg.com/alpinejs" defer></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="{{ asset('js/myscript.js') }}"></script>
 
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </head>
 
-<body class="bg-cover bg-center bg-fixed bg-no-repeat"
-    style="background-image: url('{{ asset('images/masjid-bg.jpg') }}'); font-sans antialiased min-h-screen text-gray-800 dark:text-gray-100 selection:bg-emerald-400 selection:text-white
-    transition-colors duration-500 ease-in-out"
+<body class="font-sans antialiased bg-base-200 text-base-content min-h-screen"
     x-data="flashNotification()">
 
-    <div class="min-h-screen flex flex-col">
-
-        {{-- Sidebar & Navigation --}}
-        @include('layouts.navigation')
-
-        {{-- Wrapper Konten --}}
-        <div class="flex flex-col flex-1 sm:ml-64 mt-16 sm:mt-0">
-            {{-- Page Header --}}
-            @isset($header)
-                <header class="bg-gradient-to-r from-green-700 to-green-500 text-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
+    <div class="drawer lg:drawer-open min-h-screen">
+        <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+        
+        <div class="drawer-content flex flex-col">
+            {{-- Modern Futuristic Navbar --}}
+            <div class="navbar bg-base-100/80 backdrop-blur-md border-b border-base-200 sticky top-0 z-30 px-4">
+                <div class="flex-none lg:hidden">
+                    <label for="my-drawer" class="btn btn-square btn-ghost">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="4 6h16M4 12h16M4 18h16"></path></svg>
+                    </label>
+                </div>
+                
+                <div class="flex-1">
+                    <div class="hidden lg:block">
+                        <span class="text-sm font-black uppercase tracking-widest opacity-40">Islamic Digital Ecosystem</span>
                     </div>
-                </header>
+                </div>
+
+                <div class="flex-none gap-2">
+                    {{-- Theme Toggle --}}
+                    <button @click="toggleTheme()" class="btn btn-ghost btn-circle">
+                        <template x-if="theme === 'light'">
+                            <i class="fa-solid fa-moon text-xl"></i>
+                        </template>
+                        <template x-if="theme === 'dark'">
+                            <i class="fa-solid fa-sun text-xl text-yellow-400"></i>
+                        </template>
+                    </button>
+                    
+                    {{-- Notifications --}}
+                    <div class="dropdown dropdown-end">
+                        <label tabindex="0" class="btn btn-ghost btn-circle">
+                            <div class="indicator">
+                                <i class="fa-solid fa-bell text-xl"></i>
+                                <span class="badge badge-xs badge-primary indicator-item"></span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Page Header with Linear Gradient --}}
+            @isset($header)
+                <div class="futuristic-bg text-white px-4 py-12 mb-6 shadow-2xl overflow-hidden relative">
+                    <div class="absolute inset-0 bg-black/20"></div>
+                    <div class="max-w-7xl mx-auto relative z-10" data-aos="fade-right">
+                        <h1 class="text-4xl lg:text-5xl font-black tracking-tighter">{{ $header }}</h1>
+                        <p class="mt-2 text-white/80 font-bold uppercase text-xs tracking-[0.3em]">Masjid Digital Hub</p>
+                    </div>
+                </div>
             @endisset
 
-            {{-- Page Content --}}
-            <main class="flex-grow max-w-7xl mx-auto w-full py-6 px-4 sm:px-6 lg:px-8 ">
-                @yield('content')
-
+            {{-- Main Content Space --}}
+            <main class="flex-grow p-4 lg:p-8 relative">
+                <div class="max-w-7xl mx-auto">
+                    @yield('content')
+                </div>
             </main>
 
             {{-- Footer --}}
-            <footer class="bg-green-700 text-white mt-8">
-                <div
-                    class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 sm:pl-[calc(1rem+16rem)] flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
-                    <p class="text-sm">&copy; {{ date('Y') }} SIM Masjid. All rights reserved.</p>
-                    <p class="text-sm">Dibuat dengan <span class="text-yellow-300">❤</span> untuk memakmurkan masjid</p>
+            <footer class="footer footer-center p-10 bg-base-300/50 backdrop-blur-sm text-base-content rounded mt-auto border-t border-base-200">
+                <div>
+                    <div class="p-4 bg-primary/10 rounded-full mb-4">
+                        <i class="fa fa-mosque text-3xl text-primary"></i>
+                    </div>
+                    <p class="font-black text-lg tracking-tight">
+                        {{ config('app.name', 'SIM Masjid') }}
+                    </p> 
+                    <p class="text-xs opacity-50 font-bold uppercase">Modernizing Faith Through Technology</p>
+                    <p class="text-xs mt-4">© {{ date('Y') }} - Excellence in Mosque Management</p>
                 </div>
             </footer>
         </div>
+
+        {{-- Sidebar --}}
+        <div class="drawer-side z-40 shadow-2xl">
+            <label for="my-drawer" class="drawer-overlay"></label>
+            @include('layouts.navigation')
+        </div>
     </div>
-    {{-- animasi loading --}}
+
     <x-loading />
-    {{-- Notifikasi Overlay --}}
     @include('partials.notification')
     @stack('scripts')
-
 
     <!-- AOS JS -->
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
-        // const loadingElement = document.getElementById('global-loading');
-        // const loadingBar = document.getElementById('loading-bar');
-        // const loadingText = document.getElementById('loading-text');
-        // let progress = 0;
-        // let interval = null;
-
-        // // Tampilkan loading
-        // function showLoading() {
-        //     if (!loadingElement) return;
-
-        //     loadingElement.classList.remove('hidden');
-        //     progress = 0;
-        //     loadingBar.style.width = '0%';
-        //     loadingText.textContent = 'Memuat halaman...';
-
-        //     // Simpan status loading ke localStorage
-        //     localStorage.setItem('isLoading', 'true');
-
-        //     // Jalankan animasi progress
-        //     interval = setInterval(() => {
-        //         if (progress < 95) {
-        //             progress += 15;
-        //             loadingBar.style.width = progress + '%';
-        //         }
-        //     }, 300);
-        // }
-
-        // // Sembunyikan loading
-        // function hideLoading() {
-        //     if (!loadingElement) return;
-
-        //     // Penuhkan bar, ganti teks
-        //     loadingBar.style.width = '100%';
-        //     loadingText.textContent = 'Selesai!';
-
-        //     // Beri delay biar smooth
-        //     setTimeout(() => {
-        //         loadingElement.classList.add('hidden');
-        //         clearInterval(interval);
-        //         localStorage.removeItem('isLoading');
-        //     }, 400);
-        // }
-
-        // // Pasang event ke semua form
-        // document.addEventListener('DOMContentLoaded', () => {
-        //     document.querySelectorAll('form').forEach(form => {
-        //         form.addEventListener('submit', () => {
-        //             showLoading();
-        //         });
-        //     });
-
-        //     // Pasang event ke semua link (opsional)
-        //     document.querySelectorAll('a').forEach(link => {
-        //         const href = link.getAttribute('href');
-        //         if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
-        //             link.addEventListener('click', () => {
-        //                 showLoading();
-        //             });
-        //         }
-        //     });
-        // });
-
-        // // Saat halaman selesai dimuat → sembunyikan loading
-        // window.addEventListener('load', () => {
-        //     if (localStorage.getItem('isLoading')) {
-        //         hideLoading();
-        //     }
-        // });
-
-        // Untuk form delete
         document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                once: true,
+            });
+
             document.querySelectorAll('.delete-form').forEach(form => {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
@@ -161,6 +145,4 @@
         });
     </script>
 </body>
-
-
 </html>

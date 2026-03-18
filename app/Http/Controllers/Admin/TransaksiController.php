@@ -15,42 +15,29 @@ class TransaksiController extends Controller
     public function index(Request $request)
     {
         $kategoriId = $request->input('kategori_id');
+        $kategoriList = KategoriKeuangan::all();
 
         $query = Transaksi::query();
-
         if ($kategoriId && $kategoriId != 'semua') {
             $query->where('kategori_id', $kategoriId);
         }
 
-        $totalPemasukan = (clone $query)->where('jenis', 'Pemasukan')->sum('jumlah');
-        $totalPengeluaran = (clone $query)->where('jenis', 'Pengeluaran')->sum('jumlah');
+        // Summary calculations
+        $totalPemasukan = (clone $query)->where('jenis', 'pemasukan')->sum('jumlah');
+        $totalPengeluaran = (clone $query)->where('jenis', 'pengeluaran')->sum('jumlah');
         $saldo = $totalPemasukan - $totalPengeluaran;
 
-        $transaksis = (clone $query)->with('kategori')->latest()->paginate(10);
+        $transaksis = $query->with('kategori')->latest('tanggal')->paginate(10);
+        $kategoriAktif = $kategoriId ? KategoriKeuangan::find($kategoriId) : null;
 
-        $kategoriList = KategoriKeuangan::all();
-
-        $totalPerKategori = Transaksi::select('kategori_id', DB::raw('SUM(jumlah) as total'))
-            ->with('kategori')
-            ->groupBy('kategori_id')
-            ->orderByDesc('total')
-            ->get();
-
-        $kategoriAktif = null;
-
-        if ($kategoriId && $kategoriId !== 'semua') {
-            $kategoriAktif = KategoriKeuangan::find($kategoriId);
-        }
-
-        return view('transaksi.index', compact(
-            'transaksis',
-            'kategoriList',
-            'kategoriId',
+        return view('Transaksi.index', compact(
+            'transaksis', 
+            'kategoriList', 
+            'kategoriId', 
+            'kategoriAktif',
             'totalPemasukan',
             'totalPengeluaran',
-            'saldo',
-            'totalPerKategori',
-            'kategoriAktif',
+            'saldo'
         ));
     }
 
@@ -83,8 +70,8 @@ class TransaksiController extends Controller
         $transaksi = Transaksi::where('kategori_id', $kategoriAktif->id)->get();
 
 
-        $totalPemasukan = (clone $query)->where('jenis', 'Pemasukan')->sum('jumlah');
-        $totalPengeluaran = (clone $query)->where('jenis', 'Pengeluaran')->sum('jumlah');
+        $totalPemasukan = (clone $query)->where('jenis', 'pemasukan')->sum('jumlah');
+        $totalPengeluaran = (clone $query)->where('jenis', 'pengeluaran')->sum('jumlah');
         $saldo = $totalPemasukan - $totalPengeluaran;
 
         $transaksis = (clone $query)->with('kategori')->latest()->paginate(10);

@@ -2,99 +2,130 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8" data-aos="fade-up">
-        {{-- Header --}}
-        <h1 class="text-3xl font-bold mb-2 text-center text-green-700">
-            <i class="fas fa-money-bill-wave mr-2"></i> Laporan Keuangan Masjid Al-Falah
-        </h1>
-        <p class="text-gray-600 font-semibold text-center mb-6">
-            Informasi transaksi terkini
-        </p>
+    <div class="space-y-8" data-aos="fade-up">
+        
+        {{-- Futuristic Header --}}
+        <div class="futuristic-bg p-8 md:p-12 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+            <div class="absolute inset-0 bg-black/20"></div>
+            <div class="relative z-10 text-center">
+                <h1 class="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase mb-2">
+                    Financial Ledger
+                </h1>
+                <p class="text-white/70 font-bold uppercase text-[10px] md:text-xs tracking-[0.4em]">Mosque Operational Transaction Repository</p>
+            </div>
+        </div>
 
-        {{-- Navigasi Kategori --}}
-        <nav class="bg-green-600 text-white rounded-t-lg p-4 shadow-lg mb-0">
-            <ul class="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 items-center justify-center">
-                @foreach ($kategoriList as $kategori)
-                    @php
-                        $currentKategoriId = request()->input('kategori_id');
-                        $isActive = $currentKategoriId == $kategori->id;
-                        $activeClass = $isActive
-                            ? 'bg-yellow-500 text-white'
-                            : 'text-white hover:text-yellow-300 hover:bg-green-700';
-                    @endphp
-                    <li>
-                        <a href="{{ route('umum.transaksi', ['kategori_id' => $kategori->id]) }}"
-                            class="block px-4 py-2 text-md font-semibold transition duration-300 ease-in-out rounded-lg {{ $activeClass }}">
-                            {{ $kategori->nama_kategori }}
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
-        </nav>
+        {{-- Category Navigation (Futuristic Tabs) --}}
+        <div class="flex flex-wrap justify-center gap-2 p-2 bg-base-300/30 backdrop-blur-md rounded-3xl border border-white/5">
+            @foreach ($kategoriList as $kategori)
+                @php
+                    $isActive = request()->input('kategori_id') == $kategori->id;
+                @endphp
+                <a href="{{ route('umum.transaksi', ['kategori_id' => $kategori->id]) }}"
+                   class="px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-300 {{ $isActive ? 'bg-primary text-primary-content shadow-lg scale-105' : 'hover:bg-base-200 text-base-content/60' }}">
+                   {{ $kategori->nama_kategori }}
+                </a>
+            @endforeach
+        </div>
 
-        {{-- Ringkasan Keuangan --}}
-        <div class="bg-white shadow-md p-4 rounded-b-lg mb-6 border-2 border-green-600">
-            <h2 class="text-lg font-semibold mb-3">Ringkasan {{ $activeKategoriName }}</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div x-data="counter({{ $totalPemasukan }})" x-init="start()" class="p-3 bg-green-100 rounded">
-                    {{-- pemasukan --}}
-                    <span class="block text-sm text-green-700">Total Pemasukan</span>
-                    <span class="text-xl font-bold text-green-800">
-                        Rp <span x-text="displayCount()"></span>
-                    </span>
+        {{-- Financial Summary Grid --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {{-- Total Income --}}
+            <div class="glass-card p-8 rounded-[2rem] border-success/20 overflow-hidden relative group" x-data="counter({{ $totalPemasukan }})" x-init="start()">
+                <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
+                    <i class="fa fa-arrow-down-to-bracket text-8xl text-success"></i>
                 </div>
-                {{-- pengeluaran --}}
-                <div x-data="counter({{ $totalPengeluaran }})" x-init="start()" class="p-3 bg-red-100 rounded">
-                    <span class="block text-sm text-red-700">Total Pengeluaran</span>
-                    <span class="text-xl font-bold text-red-800">
-                        Rp <span x-text="displayCount()"></span>
-                    </span>
+                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-success">Credits / Inflow</span>
+                <div class="text-3xl font-black mt-2 tracking-tighter text-base-content">
+                    Rp <span x-text="displayCount()">@isset($totalPemasukan){{ number_format($totalPemasukan, 0, ',', '.') }}@else 0 @endisset</span>
                 </div>
-                {{-- saldo --}}
-                <div x-data="counter({{ $saldo }})" x-init="start()" class="p-3 bg-blue-100 rounded">
-                    <span class="block text-sm text-blue-700">Saldo</span>
-                    <span class="text-xl font-bold text-blue-800">
-                        Rp <span x-text="displayCount()"></span>
-                    </span>
+                <div class="w-full h-1 bg-success/10 rounded-full mt-4 overflow-hidden">
+                    <div class="h-full bg-success w-2/3"></div>
+                </div>
+            </div>
+
+            {{-- Total Expense --}}
+            <div class="glass-card p-8 rounded-[2rem] border-error/20 overflow-hidden relative group" x-data="counter({{ $totalPengeluaran }})" x-init="start()">
+                <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
+                    <i class="fa fa-arrow-up-from-bracket text-8xl text-error"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-error">Debits / Outflow</span>
+                <div class="text-3xl font-black mt-2 tracking-tighter text-base-content">
+                    Rp <span x-text="displayCount()">@isset($totalPengeluaran){{ number_format($totalPengeluaran, 0, ',', '.') }}@else 0 @endisset</span>
+                </div>
+                <div class="w-full h-1 bg-error/10 rounded-full mt-4 overflow-hidden">
+                    <div class="h-full bg-error w-1/3"></div>
+                </div>
+            </div>
+
+            {{-- Net Balance --}}
+            <div class="glass-card p-8 rounded-[2rem] border-primary/20 overflow-hidden relative group" x-data="counter({{ $saldo }})" x-init="start()">
+                <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
+                    <i class="fa fa-scale-balanced text-8xl text-primary"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Current Liquid Assets</span>
+                <div class="text-3xl font-black mt-2 tracking-tighter text-base-content">
+                    Rp <span x-text="displayCount()">@isset($saldo){{ number_format($saldo, 0, ',', '.') }}@else 0 @endisset</span>
+                </div>
+                <div class="w-full h-1 bg-primary/10 rounded-full mt-4 overflow-hidden">
+                    <div class="h-full bg-primary w-full"></div>
                 </div>
             </div>
         </div>
 
-        {{-- Tabel Data --}}
-        <div class="max-w-full bg-white shadow-lg rounded-lg overflow-x-auto border-2 border-green-600" data-aos="fade-up"
-            data-aos-delay="200">
-            <table class="min-w-full leading-normal">
-                <thead class="bg-green-600 text-white">
-                    <tr>
-                        <th class="px-5 py-3 text-left text-sm font-semibold uppercase tracking-wider">No</th>
-                        <th class="px-5 py-3 text-left text-sm font-semibold uppercase tracking-wider">Tanggal</th>
-                        <th class="px-5 py-3 text-left text-sm font-semibold uppercase tracking-wider">Jenis</th>
-                        <th class="px-5 py-3 text-left text-sm font-semibold uppercase tracking-wider">Jumlah</th>
-                        <th class="px-5 py-3 text-left text-sm font-semibold uppercase tracking-wider">Keterangan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($transaksis as $item)
-                        <tr class="hover:bg-green-50 transition duration-150">
-                            <td class="px-5 py-5 text-sm">
-                                {{ $loop->iteration + ($transaksis->currentPage() - 1) * $transaksis->perPage() }}
-                            </td>
-                            <td class="px-5 py-5 text-sm">{{ $item->created_at->format('d-m-Y') }}</td>
-                            <td class="px-5 py-5 text-sm capitalize">{{ $item->jenis }}</td>
-                            <td class="px-5 py-5 text-sm">Rp {{ number_format($item->jumlah, 0, ',', '.') }}</td>
-                            <td class="px-5 py-5 text-sm">{{ $item->keterangan }}</td>
+        {{-- Transaction Ledger --}}
+        <div class="glass-card rounded-[2.5rem] overflow-hidden border-white/5 shadow-2xl">
+            <div class="p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-black tracking-tight text-base-content">{{ $activeKategoriName }} Ledger</h2>
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">System Transaction Logs</p>
+                </div>
+                <div class="badge badge-primary font-black uppercase text-[10px] tracking-widest p-4">Validated Records</div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="table table-lg w-full">
+                    <thead>
+                        <tr class="bg-base-200/50">
+                            <th class="font-black uppercase tracking-widest text-[10px] opacity-60">ID</th>
+                            <th class="font-black uppercase tracking-widest text-[10px] opacity-60">Timestamp</th>
+                            <th class="font-black uppercase tracking-widest text-[10px] opacity-60">Classification</th>
+                            <th class="font-black uppercase tracking-widest text-[10px] opacity-60">Quantifier</th>
+                            <th class="font-black uppercase tracking-widest text-[10px] opacity-60">Protocol Description</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="px-5 py-5 text-center text-gray-500">Tidak ada data</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        @forelse ($transaksis as $item)
+                            <tr class="hover:bg-primary/5 transition-colors duration-300">
+                                <td class="font-mono text-xs opacity-40">
+                                    #{{ str_pad($loop->iteration + ($transaksis->currentPage() - 1) * $transaksis->perPage(), 3, '0', STR_PAD_LEFT) }}
+                                </td>
+                                <td class="font-bold text-sm">{{ $item->created_at->format('d M Y') }}</td>
+                                <td>
+                                    <span class="badge {{ $item->jenis == 'pemasukan' ? 'badge-success' : 'badge-error' }} badge-outline font-black uppercase text-[8px] tracking-[0.2em] px-2">
+                                        {{ $item->jenis }}
+                                    </span>
+                                </td>
+                                <td class="font-black tracking-tight {{ $item->jenis == 'pemasukan' ? 'text-success' : 'text-error' }}">
+                                    Rp {{ number_format($item->jumlah, 0, ',', '.') }}
+                                </td>
+                                <td class="text-sm font-bold opacity-70">{{ $item->keterangan }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="py-20 text-center">
+                                    <i class="fa fa-database text-4xl opacity-10 mb-4 block"></i>
+                                    <span class="font-black uppercase tracking-widest opacity-20">Zero Ledger Entries</span>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         {{-- Pagination --}}
-        <div class="mt-6">
+        <div class="mt-8">
             {{ $transaksis->withQueryString()->links() }}
         </div>
     </div>

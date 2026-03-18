@@ -16,7 +16,8 @@ use App\Http\Controllers\Admin\KategoriKeuanganController;
 
 // HALAMAN UTAMA APP
 Route::get('/', function () {
-    return view('welcome');
+    $financialSummary = \App\Models\Transaksi::getSummary();
+    return view('welcome', compact('financialSummary'));
 })->name('utama');
 
 //RUTE LOGIN & REGISTER
